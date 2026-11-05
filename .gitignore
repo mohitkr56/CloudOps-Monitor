@@ -1,0 +1,46 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*credentials*
+
+# Java build output
+**/target/
+*.jar
+*.class
+
+# Backup files and archives
+*.bak
+*.backup
+*.original
+*.tar.gz
+/backups/
+
+# Logs
+*.log
+/logs/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Local configuration
+application-local.properties
+application-secret.properties
+
+# Local testing files
+/shared/
+
+# Project archives and editor backups
+*.zip
+*.save

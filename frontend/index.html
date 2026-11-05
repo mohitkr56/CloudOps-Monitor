@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CloudOps Monitor | Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0b1120;
+            --sidebar: #0e1829;
+            --panel: #111c30;
+            --border: #23324a;
+            --text: #e5edf8;
+            --muted: #8b9bb4;
+            --blue: #4f8cff;
+            --green: #22c55e;
+            --red: #ef4444;
+            --purple: #a78bfa;
+            --cyan: #22d3ee;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            padding: 26px 18px;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand span {
+            color: var(--blue);
+        }
+
+        .brand-subtitle {
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .nav-label {
+            color: #60718b;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            margin: 25px 10px 12px;
+        }
+
+        .nav-link {
+            color: var(--muted);
+            padding: 12px 14px;
+            margin-bottom: 7px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav-link.active,
+        .nav-link:hover {
+            background: #1c2c47;
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid var(--blue);
+        }
+
+        .main-content {
+            padding: 32px;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .page-title {
+            font-size: 27px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px;
+            height: 100%;
+            transition: border-color 0.2s;
+        }
+
+        .panel:hover {
+            border-color: #385276;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-label {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 13px;
+            letter-spacing: -1px;
+        }
+
+        .metric-description {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 9px;
+        }
+
+        .metric-icon {
+            position: absolute;
+            right: 22px;
+            top: 20px;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 19px;
+        }
+
+        .icon-blue {
+            background: rgba(79, 140, 255, 0.15);
+            color: var(--blue);
+        }
+
+        .icon-purple {
+            background: rgba(167, 139, 250, 0.15);
+            color: var(--purple);
+        }
+
+        .icon-cyan {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--cyan);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--green);
+            margin-right: 7px;
+        }
+
+        .status-dot.error {
+            background: var(--red);
+        }
+
+        .status-pill {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--green);
+            padding: 9px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pill.error {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--red);
+        }
+
+        .health-status {
+            color: var(--green);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .health-status.error {
+            color: var(--red);
+        }
+
+        .server-info {
+            font-size: 13px;
+            margin-bottom: 19px;
+        }
+
+        .server-info .label {
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .server-info .value {
+            color: var(--text);
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .service-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .service-row:last-child {
+            border-bottom: none;
+        }
+
+        .service-status {
+            color: var(--green);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .service-status.error {
+            color: var(--red);
+        }
+
+        .table {
+            --bs-table-bg: transparent;
+            --bs-table-color: var(--text);
+            --bs-table-border-color: var(--border);
+            font-size: 13px;
+        }
+
+        .table th {
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .table td {
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+
+        .refresh-info {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .loading {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .footer {
+            color: var(--muted);
+            font-size: 11px;
+            text-align: center;
+            margin-top: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 18px;
+            }
+
+            .brand {
+                margin-bottom: 15px;
+            }
+
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .page-title {
+                font-size: 23px;
+            }
+
+            .metric-value {
+                font-size: 27px;
+            }
+        }
+
+    /* CLOUDOPS UI POLISH V1 */
+
+    /* CLOUDOPS COMPACT DASHBOARD FIX */
+
+    .panel.mt-4 {
+        margin-top: 1rem !important;
+    }
+
+    .panel > .row.g-4 {
+        --bs-gutter-y: 1rem;
+        --bs-gutter-x: 1rem;
+    }
+
+    .panel canvas {
+        display: block;
+    }
+
+    .panel .section-title {
+        margin-bottom: 0.65rem !important;
+    }
+
+    .historical-chart-container {
+        height: 190px !important;
+        position: relative;
+    }
+
+    #historyTableBody td {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    @media (max-width: 991.98px) {
+        .historical-chart-container {
+            height: 210px !important;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .historical-chart-container {
+            height: 190px !important;
+        }
+    }
+
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: Inter, -apple-system, BlinkMacSystemFont,
+                     "Segoe UI", sans-serif;
+        line-height: 1.55;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        align-self: flex-start;
+    }
+
+    .main-content {
+        min-width: 0;
+    }
+
+    .panel {
+        border-radius: 16px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+        padding: 24px;
+    }
+
+    .metric-card {
+        min-height: 165px;
+    }
+
+    .metric-value {
+        font-variant-numeric: tabular-nums;
+    }
+
+    .section-title {
+        letter-spacing: -0.2px;
+    }
+
+    .nav-link {
+        transition: background 0.2s ease,
+                    color 0.2s ease,
+                    transform 0.2s ease;
+    }
+
+    .nav-link:hover {
+        transform: translateX(3px);
+    }
+
+    .table-responsive {
+        border-radius: 10px;
+    }
+
+    .table {
+        white-space: nowrap;
+    }
+
+    .table thead th {
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        font-size: 10px;
+        padding-bottom: 14px;
+    }
+
+    .table tbody tr {
+        transition: background 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(79, 140, 255, 0.06);
+    }
+
+    canvas {
+        max-width: 100%;
+    }
+
+    @media (min-width: 768px) and (max-width: 991.98px) {
+        .sidebar {
+            flex: 0 0 210px;
+            max-width: 210px;
+        }
+
+        .main-content {
+            flex: 1 1 0;
+            width: auto;
+            padding: 24px 18px;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .sidebar {
+            position: relative;
+            height: auto;
+            min-height: auto;
+            overflow: visible;
+        }
+
+        .main-content {
+            width: 100%;
+            padding: 22px 15px;
+        }
+
+        .panel {
+            padding: 18px;
+            border-radius: 13px;
+        }
+
+        .metric-card {
+            min-height: 145px;
+        }
+
+        .metric-value {
+            font-size: 27px;
+        }
+
+        .table {
+            font-size: 12px;
+        }
+    }
+
+
+/* FIX: Prevent panels from stretching to full parent height */
+main .panel {
+    height: auto;
+}
+
+</style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <aside class="col-md-2 sidebar">
+
+            <div class="brand">
+                Cloud<span>Ops</span>
+                <div class="brand-subtitle">INFRASTRUCTURE MONITOR</div>
+            </div>
+
+            <div class="nav-label">MAIN MENU</div>
+
+            <nav class="nav flex-column">
+                <a class="nav-link active" href="#">▦ &nbsp; Dashboard</a>
+                <a class="nav-link" href="#">▣ &nbsp; Servers</a>
+                <a class="nav-link" href="#">◉ &nbsp; Monitoring</a>
+                <a class="nav-link" href="#">▤ &nbsp; Logs</a>
+                <a class="nav-link" href="#">◈ &nbsp; Incidents</a>
+                <a class="nav-link" href="#">☁ &nbsp; Backups</a>
+            </nav>
+
+            <div class="nav-label">SYSTEM</div>
+
+            <nav class="nav flex-column">
+                <a class="nav-link" href="#">⚙ &nbsp; Settings</a>
+            </nav>
+
+            <div class="mt-5 pt-4 border-top"
+                 style="border-color: var(--border) !important;">
+
+                <div class="muted small">Environment</div>
+                <div class="mt-2 small fw-bold">AWS · Sydney</div>
+
+                <div class="muted mt-3" style="font-size: 11px;">
+                    CloudOps Monitor v1.0
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="col-md-10 main-content">
+
+            <!-- HEADER -->
+            <div class="d-flex flex-wrap justify-content-between
+                        align-items-center mb-4">
+
+                <div>
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="muted mb-0 small">
+                        Monitor your cloud infrastructure and server health.
+                    </p>
+                </div>
+
+                <div class="mt-3 mt-md-0">
+                    <span class="status-pill" id="systemStatus">
+                        <span class="status-dot" id="systemDot"></span>
+                        Connecting...
+                    </span>
+                </div>
+
+            </div>
+
+            <!-- METRICS -->
+            <div class="row g-3 mb-4">
+
+                <!-- CPU -->
+                <div class="col-md-4">
+                    <div class="panel metric-card">
+
+                        <div class="metric-label">
+                            CPU Utilization
+                        </div>
+
+                        <div class="metric-icon icon-blue">◉</div>
+
+                        <div class="metric-value" id="cpuValue">
+                            --
+                        </div>
+
+                        <div class="metric-description">
+                            AWS EC2 · CPUUtilization
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- MEMORY -->
+                <div class="col-md-4">
+                    <div class="panel metric-card">
+
+                        <div class="metric-label">
+                            Memory Usage
+                        </div>
+
+                        <div class="metric-icon icon-purple">▥</div>
+
+                        <div class="metric-value" id="memoryValue">
+                            --
+                        </div>
+
+                        <div class="metric-description">
+                            CloudWatch · mem_used_percent
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- DISK -->
+                <div class="col-md-4">
+                    <div class="panel metric-card">
+
+                        <div class="metric-label">
+                            Disk Usage
+                        </div>
+
+                        <div class="metric-icon icon-cyan">▤</div>
+
+                        <div class="metric-value" id="diskValue">
+                            --
+                        </div>
+
+                        <div class="metric-description">
+                            CloudWatch · disk_used_percent
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SERVER INFORMATION -->
+            <div class="row g-3 mb-4">
+
+                <div class="col-lg-7">
+                    <div class="panel">
+
+                        <div class="section-title mb-4">
+                            Server Overview
+                        </div>
+
+                        <div class="server-info">
+                            <div class="label">Server Name</div>
+                            <div class="value">
+                                CloudOps-Monitor-Server
+                            </div>
+                        </div>
+
+                        <div class="server-info">
+                            <div class="label">Instance ID</div>
+                            <div class="value">
+                                i-04279b18e8b2e6952
+                            </div>
+                        </div>
+
+                        <div class="server-info">
+                            <div class="label">Operating System</div>
+                            <div class="value">
+                                Amazon Linux 2023
+                            </div>
+                        </div>
+
+                        <div class="server-info">
+                            <div class="label">AWS Region</div>
+                            <div class="value">
+                                Asia Pacific (Sydney)
+                            </div>
+                        </div>
+
+                        <div class="server-info mb-0">
+                            <div class="label">Application Health</div>
+                            <div class="health-status" id="apiStatus">
+                                Checking...
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SERVICES -->
+                <div class="col-lg-5">
+                    <div class="panel">
+
+                        <div class="section-title mb-3">
+                            Infrastructure Services
+                        </div>
+
+                        <div class="service-row">
+                            <span>Apache HTTP Server</span>
+                            <span class="service-status">
+                                Configured
+                            </span>
+                        </div>
+
+                        <div class="service-row">
+                            <span>Spring Boot API</span>
+                            <span class="service-status"
+                                  id="serviceStatus">
+                                Checking...
+                            </span>
+                        </div>
+
+                        <div class="service-row">
+                            <span>CloudWatch Agent</span>
+                            <span class="service-status">
+                                Configured
+                            </span>
+                        </div>
+
+                        <div class="service-row">
+                            <span>Amazon S3 Backup</span>
+                            <span class="service-status">
+                                Verified
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RECENT ACTIVITY -->
+            <div class="panel">
+
+                <div class="d-flex justify-content-between
+                            align-items-center mb-3">
+
+                    <div class="section-title">
+                        Infrastructure Activity
+                    </div>
+
+                    <span class="refresh-info">
+                        Monitoring overview
+                    </span>
+
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Component</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+                                <td>Application health check</td>
+                                <td>Spring Boot</td>
+                                <td class="health-status" id="activityHealth">
+                                    Checking...
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Metric collection</td>
+                                <td>AWS CloudWatch</td>
+                                <td class="health-status" id="activityMetrics">
+                                    Checking...
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Backup verification</td>
+                                <td>Amazon S3</td>
+                                <td class="health-status">
+                                    Verified
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+<!-- HISTORICAL MONITORING -->
+<div class="panel mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="section-title">Historical Monitoring</div>
+        <span class="refresh-info" id="historyStatus">Loading history...</span>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4">
+            <div class="section-title mb-3">CPU Usage History</div>
+            <div class="historical-chart-container">
+                <canvas id="cpuHistoryChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="section-title mb-3">Memory Usage History</div>
+            <div class="historical-chart-container">
+                <canvas id="memoryHistoryChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="section-title mb-3">Disk Usage History</div>
+            <div class="historical-chart-container">
+                <canvas id="diskHistoryChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- HISTORICAL RECORDS -->
+<div class="panel mt-4">
+
+    <div class="section-title mb-3">Historical Records</div>
+
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Recorded At</th>
+                    <th>CPU</th>
+                    <th>Memory</th>
+                    <th>Disk</th>
+                    <th>Region</th>
+                </tr>
+            </thead>
+            <tbody id="historyTableBody">
+                <tr>
+                    <td colspan="5" class="text-center">
+                        Loading records...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+            <!-- FOOTER -->
+            <div class="d-flex flex-wrap justify-content-between
+                        mt-4 gap-2">
+
+                <div class="refresh-info">
+                    Last updated:
+                    <span id="lastUpdated">Waiting for data...</span>
+                </div>
+
+                <div class="refresh-info">
+                    Automatic refresh: 60 seconds
+                </div>
+
+            </div>
+
+            <div class="footer">
+                CloudOps Monitor | AWS Infrastructure Monitoring Lab
+            </div>
+
+        </main>
+
+    </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+
+    const REFRESH_INTERVAL = 60000;
+
+    function setStatus(elementId, message, isError = false) {
+
+        const element = document.getElementById(elementId);
+
+        element.textContent = message;
+
+        element.classList.toggle('error', isError);
+    }
+
+    async function loadDashboard() {
+
+        try {
+
+            // ---------------------------------
+            // 1. CHECK SPRING BOOT HEALTH
+            // ---------------------------------
+
+            const healthResponse =
+                await fetch('/actuator/health', {
+                    cache: 'no-store'
+                });
+
+            if (!healthResponse.ok) {
+                throw new Error('Backend health check failed');
+            }
+
+            const health = await healthResponse.json();
+
+            const isUp = health.status === 'UP';
+
+            document.getElementById('systemStatus').innerHTML =
+                '<span class="status-dot" id="systemDot"></span>' +
+                (isUp ? 'System Operational' : 'System Issue');
+
+            document.getElementById('systemStatus')
+                .classList.toggle('error', !isUp);
+
+            setStatus(
+                'apiStatus',
+                'Application ' + health.status,
+                !isUp
+            );
+
+            setStatus(
+                'serviceStatus',
+                health.status,
+                !isUp
+            );
+
+            setStatus(
+                'activityHealth',
+                health.status,
+                !isUp
+            );
+
+            // ---------------------------------
+            // 2. FETCH ACTUAL CLOUDWATCH METRICS
+            // ---------------------------------
+
+            const metricsResponse =
+                await fetch('/api/metrics', {
+                    cache: 'no-store'
+                });
+
+            if (!metricsResponse.ok) {
+                throw new Error(
+                    'CloudWatch metrics request failed: HTTP ' +
+                    metricsResponse.status
+                );
+            }
+
+            const metrics = await metricsResponse.json();
+
+            // Validate returned values.
+            const cpu = Number(metrics.cpuUsage);
+            const memory = Number(metrics.memoryUsage);
+            const disk = Number(metrics.diskUsage);
+
+            if (
+                !Number.isFinite(cpu) ||
+                !Number.isFinite(memory) ||
+                !Number.isFinite(disk)
+            ) {
+                throw new Error('Invalid metrics received');
+            }
+
+            // ---------------------------------
+            // 3. UPDATE DASHBOARD VALUES
+            // ---------------------------------
+
+            document.getElementById('cpuValue').textContent =
+                cpu.toFixed(2) + '%';
+
+            document.getElementById('memoryValue').textContent =
+                memory.toFixed(2) + '%';
+
+            document.getElementById('diskValue').textContent =
+                disk.toFixed(2) + '%';
+
+            setStatus(
+                'activityMetrics',
+                'Live data received',
+                false
+            );
+
+            // ---------------------------------
+            // 4. UPDATE LAST REFRESH TIME
+            // ---------------------------------
+
+            const updatedAt = metrics.timestamp
+                ? new Date(metrics.timestamp)
+                : new Date();
+
+            document.getElementById('lastUpdated').textContent =
+                updatedAt.toLocaleString();
+
+        } catch (error) {
+
+            console.error('Dashboard error:', error);
+
+            document.getElementById('systemStatus').innerHTML =
+                '<span class="status-dot error"></span>' +
+                'Connection Error';
+
+            document.getElementById('systemStatus')
+                .classList.add('error');
+
+            setStatus(
+                'apiStatus',
+                'Connection Failed',
+                true
+            );
+
+            setStatus(
+                'serviceStatus',
+                'Unavailable',
+                true
+            );
+
+            setStatus(
+                'activityMetrics',
+                'Unavailable',
+                true
+            );
+
+        }
+
+    }
+
+// ---------------------------------
+// HISTORICAL METRICS AND CHARTS
+// ---------------------------------
+
+let cpuHistoryChart = null;
+let memoryHistoryChart = null;
+let diskHistoryChart = null;
+
+async function loadHistoricalMetrics() {
+
+    const status = document.getElementById('historyStatus');
+    const tableBody = document.getElementById('historyTableBody');
+
+    try {
+
+        const response = await fetch(
+            '/api/metrics/history?limit=50',
+            { cache: 'no-store' }
+        );
+
+        if (!response.ok) {
+            throw new Error('History API returned HTTP ' + response.status);
+        }
+
+        const records = await response.json();
+
+        if (!Array.isArray(records)) {
+            throw new Error('Invalid history response');
+        }
+
+        if (records.length === 0) {
+            status.textContent = 'No historical records available';
+            tableBody.innerHTML =
+                '<tr><td colspan="5" class="text-center">No records found</td></tr>';
+            return;
+        }
+
+        const labels = records.map(record =>
+            new Date(record.RECORDED_AT).toLocaleTimeString()
+        );
+
+        function renderChart(existingChart, canvasId, label, values) {
+
+            if (existingChart) {
+                existingChart.destroy();
+            }
+
+            return new Chart(
+                document.getElementById(canvasId),
+                {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: label,
+                            data: values,
+                            borderWidth: 2,
+                            tension: 0.35,
+                            fill: false,
+                            pointRadius: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#e5edf8'
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    color: '#8b9bb4',
+                                    maxTicksLimit: 6
+                                },
+                                grid: {
+                                    color: 'rgba(139,155,180,0.12)'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#8b9bb4',
+                                    callback: value => value + '%'
+                                },
+                                grid: {
+                                    color: 'rgba(139,155,180,0.12)'
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+        }
+
+        cpuHistoryChart = renderChart(
+            cpuHistoryChart,
+            'cpuHistoryChart',
+            'CPU Usage',
+            records.map(record => Number(record.CPU_USAGE))
+        );
+
+        memoryHistoryChart = renderChart(
+            memoryHistoryChart,
+            'memoryHistoryChart',
+            'Memory Usage',
+            records.map(record => Number(record.MEMORY_USAGE))
+        );
+
+        diskHistoryChart = renderChart(
+            diskHistoryChart,
+            'diskHistoryChart',
+            'Disk Usage',
+            records.map(record => Number(record.DISK_USAGE))
+        );
+
+        tableBody.innerHTML = records.slice().reverse().map(record => {
+
+            const recordedAt = new Date(record.RECORDED_AT);
+
+            return `
+                <tr>
+                    <td>${recordedAt.toLocaleString()}</td>
+                    <td>${Number(record.CPU_USAGE).toFixed(2)}%</td>
+                    <td>${Number(record.MEMORY_USAGE).toFixed(2)}%</td>
+                    <td>${Number(record.DISK_USAGE).toFixed(2)}%</td>
+                    <td>${record.AWS_REGION}</td>
+                </tr>
+            `;
+
+        }).join('');
+
+        status.textContent = records.length + ' records loaded from Oracle';
+
+    } catch (error) {
+
+        console.error('Historical metrics error:', error);
+
+        status.textContent = 'History unavailable';
+
+        tableBody.innerHTML =
+            '<tr><td colspan="5" class="text-center">Unable to load historical records</td></tr>';
+
+    }
+}
+    // Initial dashboard load.
+    loadDashboard();
+loadHistoricalMetrics();
+
+
+    // Refresh every 60 seconds.
+setInterval(() => {
+    loadDashboard();
+    loadHistoricalMetrics();
+}, REFRESH_INTERVAL);
+</script>
+
+</body>
+</html>
